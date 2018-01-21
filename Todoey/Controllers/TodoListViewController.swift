@@ -11,19 +11,54 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
 
-    var itemArray = ["Find Mike","Try cocacola","Try Kooi"]
-    var checkedArray = [false,false,false]
+    var itemArray = [Item]()
+    
+//    var itemArray = ["Find Mike","Try cocacola","Try Kooi"]
+//    var checkedArray = [false,false,false]
+    
+    
+    
     let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        if let items = defaults.array(forKey: "TodoListArray") as? [String]{
-            itemArray = items
-        }
-        if let items = defaults.array(forKey: "CheckedListArray") as? [Bool]{
-            checkedArray = items
-        }
+        let item = Item()
+        let item2 = Item()
+        let item3 = Item()
+        item.description = "Find Mike"
+        item.isChecked = false
+        itemArray.append(item)
+        
+        item2.description = "Try cocacola"
+        item2.isChecked = false
+        itemArray.append(item2)
+        
+        item3.description = "Try Kooi"
+        item3.isChecked = false
+        itemArray.append(item3)
+        
+//        if let items = defaults.array(forKey: "TodoListArray") as? [Item]{
+//            itemArray = items
+//        } else {
+//            let item = Item()
+//            let item2 = Item()
+//            let item3 = Item()
+//            item.description = "Find Mike"
+//            item.isChecked = false
+//            itemArray.append(item)
+//            
+//            item2.description = "Try cocacola"
+//            item2.isChecked = false
+//            itemArray.append(item2)
+//            
+//            item3.description = "Try Kooi"
+//            item3.isChecked = false
+//            itemArray.append(item3)
+//        }
+//        if let items = defaults.array(forKey: "CheckedListArray") as? [Bool]{
+//            checkedArray = items
+//        }
     }
 
     //MARK - Tableview Datasource Methods
@@ -36,9 +71,9 @@ class TodoListViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
         
-        cell.textLabel?.text = itemArray[indexPath.row]
+        cell.textLabel?.text = itemArray[indexPath.row].description
         
-        if checkedArray[indexPath.row] == false {
+        if itemArray[indexPath.row].isChecked == false {
             
             cell.accessoryType = .none
             
@@ -63,15 +98,15 @@ class TodoListViewController: UITableViewController {
             if cell.accessoryType == .checkmark {
                 
                 cell.accessoryType = .none
-                checkedArray[indexPath.row] = false
+                itemArray[indexPath.row].isChecked = false
                 
             } else {
                 
                 cell.accessoryType = .checkmark
-                checkedArray[indexPath.row] = true
+                itemArray[indexPath.row].isChecked = true
                 
             }
-            saveUserdefaultsData()
+            //saveUserdefaultsData()
         }
     }
 
@@ -85,11 +120,12 @@ class TodoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             // What will happen when user click Add Item Button on UiAlert
+            let item = Item()
+            item.description = textField.text!
+            item.isChecked = false
+            self.itemArray.append(item)
             
-            self.itemArray.append(textField.text!)
-            self.checkedArray.append(false)
-            
-            self.saveUserdefaultsData()
+            //self.saveUserdefaultsData()
             
             self.tableView.reloadData()
             
@@ -109,7 +145,7 @@ class TodoListViewController: UITableViewController {
     func saveUserdefaultsData() {
         // save data to userdefault
         self.defaults.set(self.itemArray, forKey: "TodoListArray")
-        self.defaults.set(self.checkedArray, forKey: "CheckedListArray")
+        
     }
     
 
