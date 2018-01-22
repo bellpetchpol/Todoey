@@ -12,15 +12,15 @@ import UIKit
 class TodoListViewController: UITableViewController {
 
     var itemArray = [Item]()
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     //let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
-        loadItems()
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        //loadItems()
 
     }
 
@@ -34,9 +34,9 @@ class TodoListViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
         
-        cell.textLabel?.text = itemArray[indexPath.row].description
+        cell.textLabel?.text = itemArray[indexPath.row].title
         
-        if itemArray[indexPath.row].isChecked == false {
+        if itemArray[indexPath.row].done == false {
             
             cell.accessoryType = .none
             
@@ -61,12 +61,12 @@ class TodoListViewController: UITableViewController {
             if cell.accessoryType == .checkmark {
                 
                 cell.accessoryType = .none
-                itemArray[indexPath.row].isChecked = false
+                itemArray[indexPath.row].done = false
                 
             } else {
                 
                 cell.accessoryType = .checkmark
-                itemArray[indexPath.row].isChecked = true
+                itemArray[indexPath.row].done = true
                 
             }
             saveItems()
@@ -83,9 +83,14 @@ class TodoListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             // What will happen when user click Add Item Button on UiAlert
-            let item = Item()
-            item.description = textField.text!
-            item.isChecked = false
+            //let item = Item()
+            
+            
+            let item = Item(context: self.context)
+            
+            item.title = textField.text!
+            item.done = false
+
             self.itemArray.append(item)
             
             self.saveItems()
@@ -106,45 +111,41 @@ class TodoListViewController: UITableViewController {
     //MARK - Save Userdefaults data
     
     func saveItems() {
-        // save data to userdefault
-        //self.defaults.set(self.itemArray, forKey: "TodoListArray")
-        let encoder = PropertyListEncoder()
-        
+ 
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            try context.save()
         } catch {
             print("Error encoding item array, \(error)")
         }
         
     }
     
-    func loadItems() {
-        
-        if let data = try? Data(contentsOf: dataFilePath!){
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("Error docoding tem array \(error)")
-            }
-        } else {
-            let item = Item()
-            let item2 = Item()
-            let item3 = Item()
-            item.description = "Find Mike"
-            item.isChecked = false
-            itemArray.append(item)
-            
-            item2.description = "Try cocacola"
-            item2.isChecked = false
-            itemArray.append(item2)
-            
-            item3.description = "Try Kooi"
-            item3.isChecked = false
-            itemArray.append(item3)
-        }
-    }
+//    func loadItems() {
+//
+//        if let data = try? Data(contentsOf: dataFilePath!){
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoder.decode([Item].self, from: data)
+//            } catch {
+//                print("Error docoding tem array \(error)")
+//            }
+//        } else {
+//            let item = Item()
+//            let item2 = Item()
+//            let item3 = Item()
+//            item.title = "Find Mike"
+//            item.done = false
+//            itemArray.append(item)
+//
+//            item2.title = "Try cocacola"
+//            item2.done = false
+//            itemArray.append(item2)
+//
+//            item3.title = "Try Kooi"
+//            item3.done = false
+//            itemArray.append(item3)
+//        }
+//    }
     
 
 }
