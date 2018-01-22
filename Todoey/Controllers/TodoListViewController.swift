@@ -12,53 +12,16 @@ import UIKit
 class TodoListViewController: UITableViewController {
 
     var itemArray = [Item]()
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
-//    var itemArray = ["Find Mike","Try cocacola","Try Kooi"]
-//    var checkedArray = [false,false,false]
-    
-    
-    
-    let defaults = UserDefaults.standard
+    //let defaults = UserDefaults.standard
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        let item = Item()
-        let item2 = Item()
-        let item3 = Item()
-        item.description = "Find Mike"
-        item.isChecked = false
-        itemArray.append(item)
         
-        item2.description = "Try cocacola"
-        item2.isChecked = false
-        itemArray.append(item2)
-        
-        item3.description = "Try Kooi"
-        item3.isChecked = false
-        itemArray.append(item3)
-        
-//        if let items = defaults.array(forKey: "TodoListArray") as? [Item]{
-//            itemArray = items
-//        } else {
-//            let item = Item()
-//            let item2 = Item()
-//            let item3 = Item()
-//            item.description = "Find Mike"
-//            item.isChecked = false
-//            itemArray.append(item)
-//            
-//            item2.description = "Try cocacola"
-//            item2.isChecked = false
-//            itemArray.append(item2)
-//            
-//            item3.description = "Try Kooi"
-//            item3.isChecked = false
-//            itemArray.append(item3)
-//        }
-//        if let items = defaults.array(forKey: "CheckedListArray") as? [Bool]{
-//            checkedArray = items
-//        }
+        loadItems()
+
     }
 
     //MARK - Tableview Datasource Methods
@@ -106,7 +69,7 @@ class TodoListViewController: UITableViewController {
                 itemArray[indexPath.row].isChecked = true
                 
             }
-            //saveUserdefaultsData()
+            saveItems()
         }
     }
 
@@ -125,7 +88,7 @@ class TodoListViewController: UITableViewController {
             item.isChecked = false
             self.itemArray.append(item)
             
-            //self.saveUserdefaultsData()
+            self.saveItems()
             
             self.tableView.reloadData()
             
@@ -142,10 +105,45 @@ class TodoListViewController: UITableViewController {
     
     //MARK - Save Userdefaults data
     
-    func saveUserdefaultsData() {
+    func saveItems() {
         // save data to userdefault
-        self.defaults.set(self.itemArray, forKey: "TodoListArray")
+        //self.defaults.set(self.itemArray, forKey: "TodoListArray")
+        let encoder = PropertyListEncoder()
         
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
+        
+    }
+    
+    func loadItems() {
+        
+        if let data = try? Data(contentsOf: dataFilePath!){
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error docoding tem array \(error)")
+            }
+        } else {
+            let item = Item()
+            let item2 = Item()
+            let item3 = Item()
+            item.description = "Find Mike"
+            item.isChecked = false
+            itemArray.append(item)
+            
+            item2.description = "Try cocacola"
+            item2.isChecked = false
+            itemArray.append(item2)
+            
+            item3.description = "Try Kooi"
+            item3.isChecked = false
+            itemArray.append(item3)
+        }
     }
     
 
